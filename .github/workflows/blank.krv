@@ -1,0 +1,54 @@
+name: Teste de PC Windows
+
+on:
+  workflow_dispatch: # Permite rodar manualmente direto no GitHub
+
+jobs:
+  windows:
+    name: Ambiente Windows
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    steps:
+      # 🔹 Informações do Sistema Operacional
+      - name: Informações do Windows
+        shell: pwsh
+        run: |
+          Write-Host "`n=== SISTEMA OPERACIONAL ==="
+          Get-ComputerInfo |
+            Select-Object WindowsProductName, WindowsVersion, OsArchitecture, OsName |
+            Format-Table -AutoSize
+
+      # 🔹 Hardware: CPU e RAM juntos de forma organizada
+      - name: Informações do Computador
+        shell: pwsh
+        run: |
+          Write-Host "`n=== PROCESSADOR ==="
+          Get-CimInstance Win32_Processor |
+            Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed |
+            Format-Table -AutoSize
+
+          Write-Host "`n=== MEMÓRIA RAM ==="
+          $ram = Get-CimInstance Win32_ComputerSystem
+          $ramGB = [math]::Round($ram.TotalPhysicalMemory / 1GB, 2)
+          Write-Host "Memória total: $ramGB GB`n"
+
+      # 🔹 Informações extras úteis
+      - name: Detalhes adicionais
+        shell: pwsh
+        run: |
+          Write-Host "`n=== AMBIENTE DE EXECUÇÃO ==="
+          Write-Host "Nome do Runner: $env:RUNNER_NAME"
+          Write-Host "Sistema: $env:RUNNER_OS"
+          Write-Host "Arquitetura: $env:RUNNER_ARCH"
+          Write-Host "Versão do PowerShell: $($PSVersionTable.PSVersion)`n"
+
+      # 🔹 Confirmação final
+      - name: Teste finalizado
+        shell: pwsh
+        run: |
+          Write-Host "✅ PC Windows criado e testado com sucesso!"
+          Write-Host "⏳ Aguardando 30 segundos..."
+          Start-Sleep -Seconds 30
+          Write-Host "`n🚀 Trabalho concluído!`n"
+          
