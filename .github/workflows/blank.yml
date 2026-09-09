@@ -1,0 +1,38 @@
+name: Meu Windows Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Informações do Windows
+        shell: pwsh
+        run: |
+          Write-Host "===== WINDOWS RUNNER ====="
+          Get-ComputerInfo |
+            Select-Object WindowsProductName, WindowsVersion, OsArchitecture
+
+      - name: Informações da máquina
+        shell: pwsh
+        run: |
+          Write-Host "===== CPU ====="
+          Get-CimInstance Win32_Processor |
+            Select-Object Name, NumberOfCores
+
+          Write-Host "===== RAM ====="
+          $ram = Get-CimInstance Win32_ComputerSystem
+          Write-Host "$([math]::Round($ram.TotalPhysicalMemory / 1GB, 2)) GB"
+
+          Write-Host "===== DISCO ====="
+          Get-PSDrive C |
+            Select-Object Used,Free
+
+      - name: Teste final
+        shell: pwsh
+        run: |
+          Write-Host "Windows Runner funcionando!"
+          Start-Sleep -Seconds 30
